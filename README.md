@@ -4,7 +4,7 @@
 ![Kotlin](https://img.shields.io/badge/Kotlin-2.1.21-7F52FF?logo=kotlin&logoColor=white)
 ![Compose](https://img.shields.io/badge/Jetpack%20Compose-BOM%202025.06.00-4285F4)
 ![minSdk](https://img.shields.io/badge/minSdk-26-informational)
-![Estado](https://img.shields.io/badge/MVP-Fase%202%20completa-success)
+![Estado](https://img.shields.io/badge/MVP-Fase%202%20%2B%20Adicionales-success)
 
 App Android (Kotlin + Jetpack Compose) que conecta **entrenadores** de cualquier disciplina con sus **alumnos**: el trainer crea actividades, vincula alumnos por ID y les asigna un calendario semanal; el alumno activa/completa sus actividades, sube evidencia en foto y suma puntos frente a clasificaciones globales. Un proyecto de **Caracolas Games**.
 
@@ -22,6 +22,7 @@ App Android (Kotlin + Jetpack Compose) que conecta **entrenadores** de cualquier
 | **Fase 0** | Esqueleto modular, convención de Gradle, Hilt, módulos `api`/`impl`/`stub` | ✅ Completa |
 | **Fase 1** | Onboarding, perfiles, ADD New Activity, ADD New User + vinculación, calendario, plan semanal, notas del trainer, cerrar sesión | ✅ Completa |
 | **Fase 2** | Foto de evidencia al completar, puntuación real, las 3 clasificaciones, estrellas y comentarios | ✅ Completa |
+| **Adicionales** | Cuestionario del alumno, mensajería trainer-alumno, carrusel de categorías, pagos (solicitud del trainer), pipeline de descubrimiento "solicitud → propuesta → pago" | ✅ Completa (ver [`ADICIONALES.md`](ADICIONALES.md)) |
 | **Backend AWS** | API Gateway, Lambda, Cognito, DynamoDB, EventBridge, S3+CloudFront | ⏳ Pendiente — hoy todo vive en memoria, detrás de las mismas interfaces |
 
 Todo lo que hoy es "en memoria" (`InMemory*`, `Default*`) implementa un contrato (`:api`) pensado para sustituirse por el backend real sin tocar la UI ni las reglas de negocio.
@@ -54,7 +55,8 @@ feature/<nombre>/impl/     implementación (Compose + Hilt), o /stub si está re
   onboarding   profile   activities   muscles   media
   clients      calendar  plan         tracking
   scoring      leaderboards  reviews  discovery
-  payments     ads       notifications
+  assessment   messaging matching     payments
+  ads          notifications
   nutrition/stub  groups/stub   ← "Próximamente"
 integrations/viewer3d/     FUTURO: visor 3D/AR (Unity as a Library), punto de integración listo
 ```
@@ -75,6 +77,12 @@ El MVP no incluye VR/AR: todo pasa por el teléfono. Pero `ExerciseMediaViewer` 
 - **Tres clasificaciones** (`feature:leaderboards`): alumnos de un trainer, alumnos globales y trainers globales (ranking bayesiano por estrellas + cumplimiento + retención).
 - **Estrellas y comentarios** (`feature:reviews`): el alumno valora a su trainer vinculado; el trainer ve su resumen.
 - **Notas del trainer** a cada alumno.
+- **Reproductor de vídeo real** con Media3/ExoPlayer (`VideoMediaViewer`).
+- **Cuestionario del alumno** (`feature:assessment`): objetivos, zonas del cuerpo sobre la silueta, frecuencia de actividad, tiempo/días disponibles, consentimiento explícito para el dato de salud psicomotriz (nunca en clasificaciones); ficha de solo lectura para el trainer vinculado.
+- **Mensajería** (`feature:messaging`): chat de texto trainer-alumno, conversación automática al vincularse, contador de no leídos.
+- **Carrusel de categorías** en el nuevo Inicio del alumno (`ClientHomeV2`): disciplinas populares con auto-avance, enlaza a "Encuentra tu trainer" filtrado.
+- **Pagos** (`feature:payments`): el trainer vincula un método de cobro (PayPal/Stripe Connect/Mercado Pago, proveedores de prueba) y envía solicitudes de pago puntuales (diario/mensual/semestral/anual) a un alumno vinculado.
+- **Pipeline de descubrimiento "solicitud → propuesta → pago"** (`feature:matching`, en paralelo al vínculo por ID, que sigue igual): perfil público del trainer, solicitud del alumno con consentimiento granular (qué comparte), bandeja de solicitudes del trainer, propuesta con precio/duración/caducidad, y pago (Stripe en modo test) que vincula al alumno al aceptar.
 - Botones "Próximamente" para nutrición y clases grupales, controlados por `FeatureFlags`.
 
 ## Versiones
@@ -101,10 +109,9 @@ Comisión por transacción, publicidad (solo plan gratuito del alumno) y servici
 
 ## Próximos pasos
 
-- Backend AWS real (CDK en TypeScript: Lambda, API Gateway, Cognito, DynamoDB, EventBridge, S3+CloudFront) detrás de las interfaces ya existentes.
-- Selector de archivos / cámara real para fotos y vídeos (hoy se simulan).
-- Reproductor de video real con Media3 en `VideoMediaViewer`.
-- Pagos reales (Google Play Billing, Stripe/Mercado Pago/PayPal).
+- Backend AWS real (CDK en TypeScript: Lambda, API Gateway, Cognito, DynamoDB, EventBridge, S3+CloudFront) detrás de las interfaces ya existentes (`core/network` y `core/database` ya tienen el esqueleto — cliente Retrofit, mapeo de errores, cola de sincronización offline — pero ningún módulo lo usa todavía).
+- Selector de archivos / cámara real para fotos y vídeos (hoy se simulan con una URL fija).
+- Pagos reales: decisión pendiente sobre Google Play Billing (no admite montos libres ni periodo diario) vs. Stripe/Mercado Pago/PayPal para el cobro online; hasta entonces todo pasa por gateways de prueba.
 - Nutrición y clases grupales (hoy son stubs tras `FeatureFlags`).
 - Visor 3D/AR (`integrations/viewer3d`, Unity as a Library) cuando el punto de integración lo requiera.
 
