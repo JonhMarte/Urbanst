@@ -19,4 +19,8 @@ interface MuscleCatalog {
 interface MuscleMapRenderer {
     @Composable
     fun Render(selected: Set<MuscleId>, modifier: Modifier)
+
+    /** Igual que [Render], pero tocar una zona del cuerpo activa/desactiva ese músculo. */
+    @Composable
+    fun RenderSelectable(selected: Set<MuscleId>, onToggle: (MuscleId) -> Unit, modifier: Modifier)
 }

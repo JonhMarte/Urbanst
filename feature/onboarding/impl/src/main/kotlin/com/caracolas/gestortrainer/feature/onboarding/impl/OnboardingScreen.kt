@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import com.caracolas.gestortrainer.core.designsystem.PrimaryButton
 import com.caracolas.gestortrainer.core.model.Region
 import com.caracolas.gestortrainer.core.model.Role
+import com.caracolas.gestortrainer.core.model.UserId
 import com.caracolas.gestortrainer.feature.onboarding.api.OnboardingService
 import com.caracolas.gestortrainer.feature.onboarding.api.RegistrationData
 import com.caracolas.gestortrainer.feature.profile.api.PersonalData
@@ -36,7 +37,12 @@ import com.caracolas.gestortrainer.feature.profile.api.ProfileValidationError
 import kotlinx.coroutines.launch
 
 @Composable
-fun OnboardingScreen(role: Role, onboardingService: OnboardingService, modifier: Modifier = Modifier) {
+fun OnboardingScreen(
+    role: Role,
+    onboardingService: OnboardingService,
+    modifier: Modifier = Modifier,
+    onRegistered: (UserId) -> Unit = {},
+) {
     var fullName by rememberSaveable { mutableStateOf("") }
     var nationality by rememberSaveable { mutableStateOf("") }
     var region by rememberSaveable { mutableStateOf("España") }
@@ -144,6 +150,7 @@ fun OnboardingScreen(role: Role, onboardingService: OnboardingService, modifier:
                         is OnboardingValidationException -> exception.errors.map { it.toMessage() }
                         else -> listOf("No se pudo completar el registro. Inténtalo de nuevo.")
                     }
+                    result.getOrNull()?.let(onRegistered)
                 }
             },
             modifier = Modifier.fillMaxWidth(),

@@ -1,5 +1,6 @@
 package com.caracolas.gestortrainer.feature.discovery.impl
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -31,12 +32,15 @@ import com.caracolas.gestortrainer.feature.clients.api.LinkError
 import com.caracolas.gestortrainer.feature.clients.api.LinkException
 import com.caracolas.gestortrainer.feature.clients.api.LinkRequest
 import com.caracolas.gestortrainer.feature.clients.api.LinkService
+import com.caracolas.gestortrainer.feature.discovery.api.DiscoveryService
+import com.caracolas.gestortrainer.feature.discovery.api.TrainerQuery
+import com.caracolas.gestortrainer.feature.discovery.api.TrainerSummary
 import com.caracolas.gestortrainer.feature.profile.api.ProfileRepository
 import kotlinx.coroutines.launch
 
 /**
- * Buscar trainer por ID y enviar solicitud, y responder a las invitaciones que manda un trainer.
- * La búsqueda por actividad (DiscoveryService) llega más adelante.
+ * Buscar trainer por ID o por disciplina, enviar solicitud, y responder a las invitaciones que manda un trainer.
+ * [initialDiscipline] llega desde el carrusel de categorías de ClientHomeV2, ya filtrado.
  * [extraActions] lo rellena :app: así este módulo no depende de otras implementaciones.
  */
 @Composable
@@ -44,20 +48,57 @@ fun DiscoveryScreen(
     clientId: ClientId,
     linkService: LinkService,
     profileRepository: ProfileRepository,
+    discoveryService: DiscoveryService,
+    initialDiscipline: String? = null,
     modifier: Modifier = Modifier,
+    onOpenProfile: (TrainerSummary) -> Unit = {},
     extraActions: @Composable () -> Unit = {},
 ) {
     var trainerIdText by remember { mutableStateOf("") }
     var message by remember { mutableStateOf<String?>(null) }
+    var disciplineText by remember { mutableStateOf(initialDiscipline.orEmpty()) }
     val scope = rememberCoroutineScope()
 
     val incoming by linkService.observeIncoming(UserId(clientId.value)).collectAsState(initial = emptyList())
+    val searchResults by discoveryService.searchTrainers(TrainerQuery(discipline = disciplineText.ifBlank { null }))
+        .collectAsState(initial = emptyList())
 
     Column(
         modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Text("Encuentra tu trainer", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("Buscar por disciplina", fontWeight = FontWeight.Bold)
+            OutlinedTextField(
+                value = disciplineText,
+                onValueChange = { disciplineText = it },
+                placeholder = { Text("Ej. Yoga, Running…") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            if (disciplineText.isNotBlank()) {
+                if (searchResults.isEmpty()) {
+                    Text("Sin resultados todavía.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                searchResults.forEach { summary ->
+                    TrainerSummaryCard(
+                        summary = summary,
+                        onOpenProfile = { onOpenProfile(summary) },
+                        onRequest = {
+                            scope.launch {
+                                val result = linkService.requestByTrainerId(clientId, summary.publicId)
+                                message = result.fold(
+                                    onSuccess = { "Solicitud enviada a ${summary.displayName}." },
+                                    onFailure = { it.toUserMessage() },
+                                )
+                            }
+                        },
+                    )
+                }
+            }
+        }
 
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text("¿Ya tienes su ID?", fontWeight = FontWeight.Bold)
@@ -126,6 +167,24 @@ private fun PendingTrainerRequestCard(
             SecondaryButton(text = "Rechazar", onClick = onReject, modifier = Modifier.weight(1f))
             PrimaryButton(text = "Aceptar", onClick = onAccept, modifier = Modifier.weight(1f))
         }
+    }
+}
+
+@Composable
+private fun TrainerSummaryCard(summary: TrainerSummary, onOpenProfile: () -> Unit, onRequest: () -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Column(modifier = Modifier.weight(1f).clickable(onClick = onOpenProfile)) {
+            Text(summary.displayName, fontWeight = FontWeight.Bold)
+            Text(
+                "${summary.mainDiscipline} · ${"%.1f".format(summary.averageStars)} ★ · ${summary.yearsAsTrainer} años",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        SecondaryButton(text = "Enviar solicitud", onClick = onRequest)
     }
 }
 

@@ -3,7 +3,10 @@ package com.caracolas.gestortrainer.core.events
 import com.caracolas.gestortrainer.core.model.ActivityId
 import com.caracolas.gestortrainer.core.model.AssignmentId
 import com.caracolas.gestortrainer.core.model.ClientId
+import com.caracolas.gestortrainer.core.model.ConversationId
+import com.caracolas.gestortrainer.core.model.MessageId
 import com.caracolas.gestortrainer.core.model.Money
+import com.caracolas.gestortrainer.core.model.PaymentRequestId
 import com.caracolas.gestortrainer.core.model.SessionId
 import com.caracolas.gestortrainer.core.model.TrainerId
 import com.caracolas.gestortrainer.core.model.UserId
@@ -70,5 +73,25 @@ data class PaymentSucceeded(
 data class RefundIssued(
     val userId: UserId,
     val paymentId: String,
+    override val occurredAt: Instant,
+) : DomainEvent
+
+data class AssessmentUpdated(
+    val clientId: ClientId,
+    override val occurredAt: Instant,
+) : DomainEvent
+
+data class MessageSent(
+    val conversationId: ConversationId,
+    val messageId: MessageId,
+    val senderId: UserId,
+    override val occurredAt: Instant,
+) : DomainEvent
+
+data class PaymentRequested(
+    val id: PaymentRequestId,
+    val trainerId: TrainerId,
+    val clientId: ClientId,
+    val amount: Money,
     override val occurredAt: Instant,
 ) : DomainEvent

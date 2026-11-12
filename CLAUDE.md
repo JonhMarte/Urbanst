@@ -60,6 +60,10 @@ Lo que sí está verificado: todo el código Kotlin puro (core/model, events, fe
 3. Cuando compile: ejecutar la app en el emulador. Debe mostrar la elección de rol (trainer / alumno) y la barra inferior de cada rol, con botones "Próximamente".
 4. Explícale a Jonathan qué corregiste, en pocas líneas.
 
+## Funcionalidades adicionales (12 nov 2026)
+
+Jonathan añadió: cuestionario del alumno, mensajería, carrusel de categorías en el Inicio y pagos por solicitud del trainer. Todo está en **`ADICIONALES.md`** (en esta carpeta), con modelos, interfaces, reglas, privacidad y criterios de aceptación. Diseños: fila «Adicionales (Fase 1)» del canvas y `../Diseños/`. Se implementan **después** de que la Fase 0 compile, intercalados con la Fase 1 según el orden de ADICIONALES.md. Hay una decisión pendiente sobre Google Play y montos libres: pregunta antes del cobro real.
+
 ## Siguiente: Fase 1 (MVP núcleo)
 
 Orden sugerido (detalle en ARQUITECTURA.md §10 y en los diseños):

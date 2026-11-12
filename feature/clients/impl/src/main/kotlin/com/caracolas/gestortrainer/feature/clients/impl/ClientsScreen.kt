@@ -46,6 +46,7 @@ fun ClientsScreen(
     profileRepository: ProfileRepository,
     modifier: Modifier = Modifier,
     onSelectClient: (ClientId) -> Unit = {},
+    extraActions: @Composable () -> Unit = {},
 ) {
     var clientIdText by remember { mutableStateOf("") }
     var message by remember { mutableStateOf<String?>(null) }
@@ -59,6 +60,7 @@ fun ClientsScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Text("Usuarios", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+        extraActions()
 
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text("ADD New User", fontWeight = FontWeight.Bold)

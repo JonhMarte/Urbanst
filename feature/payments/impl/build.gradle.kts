@@ -8,4 +8,8 @@ android {
 
 dependencies {
     api(project(":feature:payments:api"))
+    implementation(project(":core:events"))
+    implementation(project(":feature:clients:api"))
+    implementation(project(":feature:profile:api"))
+    testImplementation(libs.kotlinx.coroutines.test)
 }

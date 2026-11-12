@@ -12,6 +12,7 @@ class DefaultMuscleCatalog @Inject constructor() : MuscleCatalog {
         Muscle(MuscleId("chest"), "Pectoral", MuscleGroup.UPPER),
         Muscle(MuscleId("arms"), "Brazos", MuscleGroup.UPPER),
         Muscle(MuscleId("core"), "Core", MuscleGroup.CORE),
+        Muscle(MuscleId("back"), "Espalda", MuscleGroup.UPPER),
         Muscle(MuscleId("glutes"), "Glúteos", MuscleGroup.LOWER),
         Muscle(MuscleId("quads"), "Cuádriceps", MuscleGroup.LOWER),
         Muscle(MuscleId("hamstrings"), "Isquiotibiales", MuscleGroup.LOWER),

@@ -15,3 +15,7 @@ package com.caracolas.gestortrainer.core.model
 @JvmInline value class NoteId(val value: String)
 @JvmInline value class PlanId(val value: String)
 @JvmInline value class GroupId(val value: String)
+@JvmInline value class ConversationId(val value: String)
+@JvmInline value class MessageId(val value: String)
+@JvmInline value class PaymentRequestId(val value: String)
+@JvmInline value class TrainerRequestId(val value: String)

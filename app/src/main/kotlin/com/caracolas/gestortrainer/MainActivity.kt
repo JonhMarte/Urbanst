@@ -10,20 +10,28 @@ import com.caracolas.gestortrainer.core.featureflags.FeatureFlags
 import com.caracolas.gestortrainer.feature.activities.api.ActivityRepository
 import com.caracolas.gestortrainer.feature.activities.api.ActivityValidator
 import com.caracolas.gestortrainer.feature.ads.api.AdProvider
+import com.caracolas.gestortrainer.feature.assessment.api.AssessmentRepository
+import com.caracolas.gestortrainer.feature.assessment.api.AssessmentValidator
 import com.caracolas.gestortrainer.feature.calendar.api.AssignmentService
 import com.caracolas.gestortrainer.feature.clients.api.ClientRosterRepository
 import com.caracolas.gestortrainer.feature.clients.api.LinkService
 import com.caracolas.gestortrainer.feature.clients.api.TrainerNotesService
+import com.caracolas.gestortrainer.feature.discovery.api.DiscoveryService
 import com.caracolas.gestortrainer.feature.media.api.MediaUploader
 import com.caracolas.gestortrainer.feature.media.api.MediaViewerRegistry
+import com.caracolas.gestortrainer.feature.messaging.api.MessagingService
 import com.caracolas.gestortrainer.feature.muscles.api.MuscleCatalog
 import com.caracolas.gestortrainer.feature.muscles.api.MuscleMapRenderer
 import com.caracolas.gestortrainer.feature.onboarding.api.OnboardingService
 import com.caracolas.gestortrainer.feature.leaderboards.api.LeaderboardService
+import com.caracolas.gestortrainer.feature.matching.api.MatchingService
+import com.caracolas.gestortrainer.feature.payments.api.PaymentRequestService
+import com.caracolas.gestortrainer.feature.payments.api.PayoutProviderRegistry
 import com.caracolas.gestortrainer.feature.plan.api.WeeklyPlanService
 import com.caracolas.gestortrainer.feature.profile.api.ProfileRepository
 import com.caracolas.gestortrainer.feature.profile.api.ProfileValidator
 import com.caracolas.gestortrainer.feature.reviews.api.ReviewService
+import com.caracolas.gestortrainer.feature.scoring.api.ScoreRepository
 import com.caracolas.gestortrainer.feature.tracking.api.ActivityTracker
 import com.caracolas.gestortrainer.ui.AppDependencies
 import com.caracolas.gestortrainer.ui.GestorApp
@@ -52,6 +60,14 @@ class MainActivity : ComponentActivity() {
     @Inject lateinit var activityTracker: ActivityTracker
     @Inject lateinit var leaderboardService: LeaderboardService
     @Inject lateinit var reviewService: ReviewService
+    @Inject lateinit var scoreRepository: ScoreRepository
+    @Inject lateinit var assessmentRepository: AssessmentRepository
+    @Inject lateinit var assessmentValidator: AssessmentValidator
+    @Inject lateinit var discoveryService: DiscoveryService
+    @Inject lateinit var messagingService: MessagingService
+    @Inject lateinit var paymentRequestService: PaymentRequestService
+    @Inject lateinit var payoutProviderRegistry: PayoutProviderRegistry
+    @Inject lateinit var matchingService: MatchingService
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,6 +93,14 @@ class MainActivity : ComponentActivity() {
             activityTracker = activityTracker,
             leaderboardService = leaderboardService,
             reviewService = reviewService,
+            scoreRepository = scoreRepository,
+            assessmentRepository = assessmentRepository,
+            assessmentValidator = assessmentValidator,
+            discoveryService = discoveryService,
+            messagingService = messagingService,
+            paymentRequestService = paymentRequestService,
+            payoutProviderRegistry = payoutProviderRegistry,
+            matchingService = matchingService,
         )
         setContent {
             GestorTheme {
